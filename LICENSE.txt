@@ -1,0 +1,1 @@
+HoloHand demo source code is provided for personal learning and demonstration purposes. Third-party packages and Three.js remain subject to their respective licenses.

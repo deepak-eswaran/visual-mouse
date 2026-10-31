@@ -1,0 +1,13 @@
+{
+  "camera_index": 0,
+  "mirror_camera": true,
+  "screen_margin": 0.08,
+  "smoothing": 0.28,
+  "pinch_start_ratio": 0.34,
+  "pinch_release_ratio": 0.48,
+  "gesture_hold_seconds": 0.45,
+  "double_click_cooldown": 0.9,
+  "scroll_sensitivity": 2.0,
+  "show_camera_window": true,
+  "move_when_open_hand": true
+}

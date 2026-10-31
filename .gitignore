@@ -1,0 +1,10 @@
+# Python desktop utility
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local tooling / OS files
+.DS_Store
+Thumbs.db
+.vercel/
