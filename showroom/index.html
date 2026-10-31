@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080b10">
+  <meta name="description" content="Explore real-time 3D objects using hand gestures in your browser.">
+  <title>HoloHand — Gesture 3D Studio</title>
+  <link rel="stylesheet" href="./src/styles.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="HoloHand home">
+      <span class="brand-mark">H</span>
+      <span class="brand-copy">
+        <strong>HOLOHAND</strong>
+        <small>GESTURE 3D STUDIO</small>
+      </span>
+    </a>
+    <div class="topbar-actions">
+      <span class="connection-state"><i id="stateDot"></i><span id="stateText">3D STUDIO READY</span></span>
+      <button id="showCamera" class="utility-button hidden">Show camera</button>
+      <button id="enableHand" class="primary-button"><span class="button-icon">✳</span> Enable hand mode</button>
+    </div>
+  </header>
+
+  <main class="app-layout">
+    <section class="viewer-column">
+      <div class="viewer-card">
+        <div class="viewer-topline">
+          <div>
+            <div class="kicker">INTERACTIVE OBJECT VIEWER <span class="kicker-dot"></span></div>
+            <h1 id="modelTitle">Stormforged Hammer</h1>
+            <p id="modelSubtitle">A Norse-inspired forged artefact · Original concept</p>
+          </div>
+          <div class="viewer-actions">
+            <button class="icon-button" id="resetView" title="Reset camera"><span>↺</span><b>Reset</b></button>
+            <button class="icon-button" id="autoRotate" title="Toggle auto rotation"><span>◌</span><b>Auto rotate</b></button>
+            <button class="icon-button" id="zoomIn" title="Zoom in"><span>＋</span><b>Zoom in</b></button>
+            <button class="icon-button" id="zoomOut" title="Zoom out"><span>－</span><b>Zoom out</b></button>
+          </div>
+        </div>
+
+        <div id="viewport" class="viewport">
+          <canvas id="threeCanvas" aria-label="Interactive 3D model"></canvas>
+          <div class="studio-label"><span class="live-dot"></span> LIVE 3D RENDER</div>
+          <div id="loadState" class="load-state"><span class="loader"></span><span>Preparing studio…</span></div>
+          <div id="modelError" class="model-error hidden"></div>
+          <div class="viewport-bottom">
+            <span id="assetLabel">ORIGINAL 3D ASSET</span>
+            <span>PINCH + MOVE TO ROTATE <i>·</i> TWO FINGERS TO ZOOM</span>
+          </div>
+        </div>
+
+        <div class="viewer-foot">
+          <div class="micro-stat"><span>SELECTED MODEL</span><strong id="selectedModelStat">STORMFORGED HAMMER</strong></div>
+          <div class="micro-stat"><span>CONTROL MODE</span><strong id="controlMode">MOUSE / TOUCH READY</strong></div>
+          <div class="micro-stat"><span>RENDER ENGINE</span><strong>THREE.JS / WEBGL</strong></div>
+        </div>
+      </div>
+
+      <section class="collection-section">
+        <div class="section-heading">
+          <div><span class="kicker">THE COLLECTION</span><h2>Choose an object</h2></div>
+          <span class="section-note">Point to a card, then pinch to select</span>
+        </div>
+        <div class="collection-grid" id="collection">
+          <button class="model-card active" data-model="hammer">
+            <span class="model-card-icon hammer-symbol">⚒</span>
+            <span class="model-card-copy"><strong>Stormforged</strong><small>Mythic hammer</small></span>
+            <span class="card-index">01</span>
+          </button>
+          <button class="model-card" data-model="car">
+            <span class="model-card-icon car-symbol">▰</span>
+            <span class="model-card-copy"><strong>Concept GT</strong><small>Mid-engine supercar</small></span>
+            <span class="card-index">02</span>
+          </button>
+          <button class="model-card" data-model="bike">
+            <span class="model-card-icon bike-symbol">⌁</span>
+            <span class="model-card-copy"><strong>Roadline</strong><small>Sport motorcycle</small></span>
+            <span class="card-index">03</span>
+          </button>
+          <button class="model-card" data-model="drone">
+            <span class="model-card-icon drone-symbol">✣</span>
+            <span class="model-card-copy"><strong>Skyframe</strong><small>Quadcopter drone</small></span>
+            <span class="card-index">04</span>
+          </button>
+          <button class="model-card" data-model="watch">
+            <span class="model-card-icon watch-symbol">◷</span>
+            <span class="model-card-copy"><strong>Meridian</strong><small>Analog wristwatch</small></span>
+            <span class="card-index">05</span>
+          </button>
+          <button class="model-card" data-model="sneaker">
+            <span class="model-card-icon sneaker-symbol">◒</span>
+            <span class="model-card-copy"><strong>Aero Runner</strong><small>Performance sneaker</small></span>
+            <span class="card-index">06</span>
+          </button>
+        </div>
+      </section>
+    </section>
+
+    <aside class="right-rail">
+      <section class="rail-card selected-card">
+        <div class="rail-eyebrow">OBJECT DETAILS</div>
+        <div class="detail-heading"><span id="detailGlyph">⚒</span><div><h2 id="detailName">Stormforged Hammer</h2><p id="detailCategory">MYTHIC ARTEFACT / 01</p></div></div>
+        <p id="detailDescription" class="detail-description">A custom Norse-inspired storm hammer, forged in darkened steel with engraved bands and a wrapped handle.</p>
+        <div class="detail-rule"></div>
+        <div class="detail-row"><span>MODEL FORMAT</span><strong id="modelFormat">PROCEDURAL 3D</strong></div>
+        <div class="detail-row"><span>INTERACTION</span><strong>HAND / MOUSE</strong></div>
+      </section>
+
+      <section class="rail-card hand-card">
+        <div class="rail-heading"><span class="rail-eyebrow">GESTURE CONTROLS</span><span class="beta-pill">BROWSER AI</span></div>
+        <div class="gesture-guide">
+          <div class="gesture-icon">☝</div><div><strong>Point</strong><small>Move the on-screen hand pointer</small></div>
+        </div>
+        <div class="gesture-guide">
+          <div class="gesture-icon">🤏</div><div><strong>Pinch + move</strong><small>Grab the model and rotate it</small></div>
+        </div>
+        <div class="gesture-guide">
+          <div class="gesture-icon">✌</div><div><strong>Two fingers</strong><small>Move up to zoom in, down to zoom out</small></div>
+        </div>
+        <div class="gesture-guide">
+          <div class="gesture-icon">✋</div><div><strong>Open-palm swipe</strong><small>Swipe left or right to change models</small></div>
+        </div>
+        <div class="gesture-guide">
+          <div class="gesture-icon">👌</div><div><strong>Pinch and release</strong><small>Select cards and controls</small></div>
+        </div>
+        <div class="hand-status"><i id="handStatusDot"></i><span id="handStatus">Hand mode is off</span></div>
+      </section>
+
+      <section class="rail-card tips-card">
+        <div class="rail-eyebrow">QUICK START</div>
+        <p>Enable hand mode and allow camera access. Your camera preview stays inside this page. No separate camera window or new tab.</p>
+        <button id="showGestureHelp" class="text-button">How gestures work <span>↗</span></button>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <span>HOLOHAND · GESTURE 3D STUDIO</span>
+    <span>Developed by <strong>Deepak Eswaran</strong></span>
+    <span>Camera frames are processed in your browser</span>
+  </footer>
+
+  <div id="gesturePointer" class="gesture-pointer hidden"><span></span></div>
+
+  <button id="cameraRestore" class="camera-restore hidden">
+    <span class="live-dot"></span> CAMERA LIVE <b>＋</b>
+  </button>
+
+  <section id="cameraDock" class="camera-dock hidden" aria-label="Camera preview">
+    <div class="camera-dock-header">
+      <div class="camera-title"><i class="live-dot"></i><span>HAND TRACKING</span><small id="cameraFps">LIVE</small></div>
+      <div class="camera-tools">
+        <button id="cameraMinimize" title="Minimize camera">−</button>
+        <button id="cameraMaximize" title="Maximize camera">□</button>
+        <button id="cameraStop" title="Disable hand mode">×</button>
+      </div>
+    </div>
+    <div class="camera-feed">
+      <video id="cameraVideo" autoplay muted playsinline></video>
+      <canvas id="cameraOverlay"></canvas>
+      <div id="cameraHint" class="camera-hint">Show one hand to begin</div>
+    </div>
+    <div class="camera-dock-footer"><span id="cameraGestureState">Waiting for hand…</span><button id="hideCameraPreview">Hide preview</button></div>
+  </section>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <dialog id="gestureHelp" class="help-dialog">
+    <div class="help-head"><div><span class="kicker">HOLOHAND GUIDE</span><h2>Explore with your hand</h2></div><button id="closeHelp">×</button></div>
+    <p>Enable hand mode, allow camera permission, then keep one hand visible in front of your camera.</p>
+    <ol>
+      <li><strong>Point:</strong> your index fingertip moves the floating pointer around the page.</li>
+      <li><strong>Pinch:</strong> touch your thumb and index fingertips together. Pinch and move over the 3D object to rotate it; pinch and release over a control to select it.</li>
+      <li><strong>Zoom:</strong> raise your index and middle fingers while keeping ring and little fingers folded. Move your hand up to zoom in and down to zoom out.</li>
+      <li><strong>Switch object:</strong> open your palm and swipe horizontally to move through the collection.</li>
+    </ol>
+    <p class="dialog-note">For best tracking, face the camera, keep your hand well lit, and stay about an arm's length away.</p>
+    <button id="closeHelpBottom" class="primary-button full-width">Got it</button>
+  </dialog>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
